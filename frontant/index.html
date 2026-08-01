@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ResearchMind — AI Research Assistant</title>
+<link rel="stylesheet" href="style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <div class="bg-glow"></div>
+
+  <nav class="navbar">
+    <div class="brand">
+      <span class="brand-mark">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="3" fill="#0a0a0f"/>
+          <circle cx="4" cy="6" r="2" fill="#0a0a0f"/>
+          <circle cx="20" cy="6" r="2" fill="#0a0a0f"/>
+          <circle cx="4" cy="18" r="2" fill="#0a0a0f"/>
+          <circle cx="20" cy="18" r="2" fill="#0a0a0f"/>
+          <path d="M12 9V4M12 15v5M9.5 10.5 5.5 7M14.5 10.5l4-3.5M9.5 13.5l-4 3.5M14.5 13.5l4 3.5" stroke="#0a0a0f" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <span class="brand-name">ResearchMind</span>
+    </div>
+    <div class="nav-links">
+      <a href="index.html" class="active">New Report</a>
+      <a href="history.html">History</a>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <span class="eyebrow">Multi-Agent AI System</span>
+    <h1 class="logo-lockup">🔬 Research<em>Mind</em></h1>
+    <p class="subtext">Four specialized AI agents collaborate — searching, scraping, writing, and critiquing — to deliver a polished research report on any topic.</p>
+  </header>
+
+  <div class="divider"></div>
+
+  <section class="stats-strip">
+    <div class="stat-item">
+      <span class="stat-number">4</span>
+      <span class="stat-label">AI Agents</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-number">&lt;60s</span>
+      <span class="stat-label">Avg. Report Time</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-number">MySQL</span>
+      <span class="stat-label">Persistent History</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-number">/10</span>
+      <span class="stat-label">Self-Critiqued Score</span>
+    </div>
+  </section>
+
+  <section class="feature-grid">
+    <div class="feature-card">
+      <div class="feature-icon">🌐</div>
+      <h4>Live Web Search</h4>
+      <p>Pulls fresh, reliable sources for every topic instead of relying on stale training data.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🧠</div>
+      <h4>Deep Reading</h4>
+      <p>Scrapes and digests the most relevant source in full, not just a search snippet.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📝</div>
+      <h4>Structured Reports</h4>
+      <p>Every report follows a clean format — introduction, findings, conclusion, sources.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎯</div>
+      <h4>Self-Critiqued</h4>
+      <p>A dedicated critic agent scores and reviews the draft before you ever see it.</p>
+    </div>
+  </section>
+
+  <section class="main-grid">
+
+    <div class="input-col">
+      <form id="research-form" class="input-card">
+        <label for="topic-input" class="input-label">Research Topic</label>
+        <input
+          type="text"
+          id="topic-input"
+          placeholder="e.g. Quantum computing breakthroughs in 2026"
+          autocomplete="off"
+          required
+        >
+        <button type="submit" id="submit-btn">
+          <span class="btn-bolt">⚡</span>
+          <span class="btn-label">Run Research Pipeline</span>
+        </button>
+
+        <label class="cache-toggle">
+          <input type="checkbox" id="use-cache" checked>
+          <span>Reuse a saved report if this topic was researched before</span>
+        </label>
+      </form>
+
+      <div class="chips">
+        <span class="chips-label">TRY →</span>
+        <span class="chip" data-topic="LLM agents in 2026">LLM agents 2026</span>
+        <span class="chip" data-topic="CRISPR gene editing">CRISPR gene editing</span>
+        <span class="chip" data-topic="Fusion energy progress">Fusion energy progress</span>
+      </div>
+    </div>
+
+    <div class="pipeline-col">
+      <h3 class="pipeline-heading">Pipeline</h3>
+
+      <div class="step-card" data-step="search">
+        <div class="step-icon">🔍</div>
+        <div class="step-info">
+          <div class="step-top">
+            <span class="step-num">01</span>
+            <span class="step-title">Search Agent</span>
+          </div>
+          <span class="step-desc">Gathers recent web information</span>
+        </div>
+        <span class="step-status">WAITING</span>
+      </div>
+
+      <div class="step-card" data-step="read">
+        <div class="step-icon">📄</div>
+        <div class="step-info">
+          <div class="step-top">
+            <span class="step-num">02</span>
+            <span class="step-title">Reader Agent</span>
+          </div>
+          <span class="step-desc">Scrapes &amp; extracts deep content</span>
+        </div>
+        <span class="step-status">WAITING</span>
+      </div>
+
+      <div class="step-card" data-step="write">
+        <div class="step-icon">✍️</div>
+        <div class="step-info">
+          <div class="step-top">
+            <span class="step-num">03</span>
+            <span class="step-title">Writer Chain</span>
+          </div>
+          <span class="step-desc">Drafts the full research report</span>
+        </div>
+        <span class="step-status">WAITING</span>
+      </div>
+
+      <div class="step-card" data-step="critic">
+        <div class="step-icon">🧐</div>
+        <div class="step-info">
+          <div class="step-top">
+            <span class="step-num">04</span>
+            <span class="step-title">Critic Chain</span>
+          </div>
+          <span class="step-desc">Reviews &amp; scores the report</span>
+        </div>
+        <span class="step-status">WAITING</span>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- Result Panel -->
+  <section id="result-panel" class="result-panel hidden">
+
+    <div class="result-header">
+      <div>
+        <p class="result-topic-label">Report on</p>
+        <h2 id="result-topic"></h2>
+      </div>
+      <div class="result-actions">
+        <span id="cache-badge" class="badge hidden">From history</span>
+        <button id="download-btn" class="ghost-btn">Download .md</button>
+      </div>
+    </div>
+
+    <div class="result-grid">
+      <article class="report-card">
+        <h3>Report</h3>
+        <div id="report-content" class="report-body"></div>
+      </article>
+
+      <aside class="critic-card">
+        <h3>Critic Review</h3>
+        <div id="critic-content" class="critic-body"></div>
+      </aside>
+    </div>
+  </section>
+
+  <div id="error-banner" class="error-banner hidden"></div>
+
+  <p class="footer-notice">ResearchMind · Powered by a LangChain multi-agent pipeline</p>
+
+  <script src="render.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

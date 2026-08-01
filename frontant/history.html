@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>History — ResearchMind</title>
+<link rel="stylesheet" href="style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <div class="bg-glow"></div>
+  <div class="bg-grid"></div>
+
+  <nav class="navbar">
+    <div class="brand">
+      <span class="brand-mark">◆</span>
+      <span class="brand-name">ResearchMind</span>
+    </div>
+    <div class="nav-links">
+      <a href="index.html">New Report</a>
+      <a href="history.html" class="active">History</a>
+    </div>
+  </nav>
+
+  <main class="history-hero">
+    <p class="eyebrow">Past Reports</p>
+    <h1>Everything researched<br>so far.</h1>
+    <p class="subtext">Every report ResearchMind has generated is saved here. Click any topic to open the full report and critic review again.</p>
+  </main>
+
+  <section class="history-panel">
+    <div id="history-list" class="history-list">
+      <!-- Rows get injected here by history.js -->
+    </div>
+
+    <div id="empty-state" class="empty-state hidden">
+      <p>No reports yet.</p>
+      <a href="index.html" class="ghost-btn">Generate your first report →</a>
+    </div>
+  </section>
+
+  <!-- Detail view (shown when a history row is clicked) -->
+  <section id="detail-panel" class="result-panel hidden">
+    <div class="result-header">
+      <div>
+        <p class="result-topic-label">Report on</p>
+        <h2 id="detail-topic"></h2>
+      </div>
+      <div class="result-actions">
+        <button id="back-btn" class="ghost-btn">← Back to list</button>
+      </div>
+    </div>
+
+    <div class="result-grid">
+      <article class="report-card">
+        <h3>Report</h3>
+        <div id="detail-report" class="report-body"></div>
+      </article>
+
+      <aside class="critic-card">
+        <h3>Critic Review</h3>
+        <div id="detail-feedback" class="critic-body"></div>
+      </aside>
+    </div>
+  </section>
+
+  <div id="error-banner" class="error-banner hidden"></div>
+
+  <p class="footer-notice">ResearchMind · Powered by a LangChain multi-agent pipeline</p>
+
+  <script src="render.js"></script>
+  <script src="history.js"></script>
+</body>
+</html>
