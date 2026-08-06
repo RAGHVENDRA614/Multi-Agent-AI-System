@@ -1,189 +1,144 @@
-import mysql.connector
-from mysql.connector import Error
-from dotenv import load_dotenv
+import sqlite3
+import json
 import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-load_dotenv(os.path.join(BASE_DIR, ".env"))
-import json
-print("HOST =", os.getenv("MYSQL_HOST"))
-print("USER =", os.getenv("MYSQL_USER"))
-print("PASSWORD =", os.getenv("MYSQL_PASSWORD"))
-print("DATABASE =", os.getenv("MYSQL_DATABASE"))
-
-# ---------------- Connection Settings ----------------
-DB_CONFIG = {
-    "host": os.getenv("MYSQL_HOST", "localhost"),
-    "user": os.getenv("MYSQL_USER", "root"),
-    "password": os.getenv("MYSQL_PASSWORD", ""),
-    "database": os.getenv("MYSQL_DATABASE", "researchmind"),
-}
+DB_PATH = os.path.join(BASE_DIR, "researchmind.db")
 
 
 def get_connection():
-    """Create and return a new MySQL connection."""
-    try:
-        conn = mysql.connector.connect(**DB_CONFIG)
-        return conn
-    except Error as e:
-        print(f"❌ Database connection failed: {e}")
-        return None
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
 
 
 def init_db():
-    """
-    Create the database (if not exists) and the reports table.
-    Run this once when the app starts.
-    """
-    try:
-        # Step 1: Connect WITHOUT specifying database (so we can create it)
-        temp_config = DB_CONFIG.copy()
-        temp_config.pop("database")
-
-        conn = mysql.connector.connect(**temp_config)
-        cursor = conn.cursor()
-
-        cursor.execute(f"CREATE DATABASE IF NOT EXISTS {DB_CONFIG['database']}")
-        cursor.close()
-        conn.close()
-
-        # Step 2: Connect to the actual database and create table
-        conn = get_connection()
-        cursor = conn.cursor()
-
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS reports (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                topic VARCHAR(255) NOT NULL,
-                search_results LONGTEXT,
-                scraped_content LONGTEXT,
-                report LONGTEXT,
-                feedback LONGTEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        """)
-
-        conn.commit()
-        cursor.close()
-        conn.close()
-        print("✅ Database and table ready.")
-
-    except Error as e:
-        print(f"❌ init_db failed: {e}")
-
-
-def save_report(topic: str, search_results: str, scraped_content: str, report: str, feedback: str) -> int:
-    """
-    Save a completed research report into the database.
-    Returns the inserted row's id.
-    """
     conn = get_connection()
-    if conn is None:
-        return None
+    cursor = conn.cursor()
 
-    try:
-        cursor = conn.cursor()
-        query = """
-            INSERT INTO reports (topic, search_results, scraped_content, report, feedback)
-            VALUES (%s, %s, %s, %s, %s)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS reports (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            topic TEXT NOT NULL,
+            search_results TEXT,
+            scraped_content TEXT,
+            report TEXT,
+            feedback TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    conn.commit()
+    conn.close()
+
+    print("✅ SQLite Database Ready.")
+
+
+def save_report(topic, search_results, scraped_content, report, feedback):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    search_results = (
+        json.dumps(search_results, ensure_ascii=False)
+        if isinstance(search_results, (list, dict))
+        else search_results
+    )
+
+    scraped_content = (
+        json.dumps(scraped_content, ensure_ascii=False)
+        if isinstance(scraped_content, (list, dict))
+        else scraped_content
+    )
+
+    report = (
+        json.dumps(report, ensure_ascii=False)
+        if isinstance(report, (list, dict))
+        else report
+    )
+
+    feedback = (
+        json.dumps(feedback, ensure_ascii=False)
+        if isinstance(feedback, (list, dict))
+        else feedback
+    )
+
+    cursor.execute(
         """
-        values = (
-    topic,
-    json.dumps(search_results, ensure_ascii=False) if isinstance(search_results, (list, dict)) else search_results,
-    json.dumps(scraped_content, ensure_ascii=False) if isinstance(scraped_content, (list, dict)) else scraped_content,
-    json.dumps(report, ensure_ascii=False) if isinstance(report, (list, dict)) else report,
-    json.dumps(feedback, ensure_ascii=False) if isinstance(feedback, (list, dict)) else feedback,
-)
-        cursor.execute(query, values)
-        conn.commit()
+        INSERT INTO reports
+        (topic, search_results, scraped_content, report, feedback)
+        VALUES (?, ?, ?, ?, ?)
+        """,
+        (
+            topic,
+            search_results,
+            scraped_content,
+            report,
+            feedback,
+        ),
+    )
 
-        new_id = cursor.lastrowid
+    conn.commit()
+    new_id = cursor.lastrowid
+    conn.close()
 
-        cursor.close()
-        conn.close()
-        return new_id
-
-    except Error as e:
-        print(f"❌ save_report failed: {e}")
-        return None
+    return new_id
 
 
-def get_history(limit: int = 20) -> list:
-    """
-    Fetch the most recent reports (id, topic, created_at only —
-    lightweight for listing on a history page).
-    """
+def get_history(limit=20):
     conn = get_connection()
-    if conn is None:
-        return []
+    cursor = conn.cursor()
 
-    try:
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("""
-            SELECT id, topic, created_at
-            FROM reports
-            ORDER BY created_at DESC
-            LIMIT %s
-        """, (limit,))
-        rows = cursor.fetchall()
-        cursor.close()
-        conn.close()
-        return rows
+    cursor.execute(
+        """
+        SELECT id, topic, created_at
+        FROM reports
+        ORDER BY created_at DESC
+        LIMIT ?
+        """,
+        (limit,),
+    )
 
-    except Error as e:
-        print(f"❌ get_history failed: {e}")
-        return []
+    rows = [dict(row) for row in cursor.fetchall()]
+    conn.close()
+
+    return rows
 
 
-def get_report_by_id(report_id: int) -> dict:
-    """
-    Fetch a single full report by its id (used when user clicks
-    on a history item to view the full report).
-    """
+def get_report_by_id(report_id):
     conn = get_connection()
-    if conn is None:
-        return None
+    cursor = conn.cursor()
 
-    try:
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM reports WHERE id = %s", (report_id,))
-        row = cursor.fetchone()
-        cursor.close()
-        conn.close()
-        return row
+    cursor.execute(
+        "SELECT * FROM reports WHERE id = ?",
+        (report_id,),
+    )
 
-    except Error as e:
-        print(f"❌ get_report_by_id failed: {e}")
-        return None
+    row = cursor.fetchone()
+    conn.close()
+
+    return dict(row) if row else None
 
 
-def check_existing_report(topic: str) -> dict:
-    """
-    Check if a report already exists for this exact topic
-    (used for simple caching — avoid re-running the whole pipeline).
-    """
+def check_existing_report(topic):
     conn = get_connection()
-    if conn is None:
-        return None
+    cursor = conn.cursor()
 
-    try:
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("""
-            SELECT * FROM reports
-            WHERE topic = %s
-            ORDER BY created_at DESC
-            LIMIT 1
-        """, (topic,))
-        row = cursor.fetchone()
-        cursor.close()
-        conn.close()
-        return row
+    cursor.execute(
+        """
+        SELECT *
+        FROM reports
+        WHERE topic = ?
+        ORDER BY created_at DESC
+        LIMIT 1
+        """,
+        (topic,),
+    )
 
-    except Error as e:
-        print(f"❌ check_existing_report failed: {e}")
-        return None
+    row = cursor.fetchone()
+    conn.close()
+
+    return dict(row) if row else None
 
 
 if __name__ == "__main__":
-    # Run this file directly to set up the database:  python database.py
     init_db()
