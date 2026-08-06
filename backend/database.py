@@ -1,9 +1,15 @@
 import mysql.connector
 from mysql.connector import Error
-import os
 from dotenv import load_dotenv
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+load_dotenv(os.path.join(BASE_DIR, ".env"))
 import json
-load_dotenv()
+print("HOST =", os.getenv("MYSQL_HOST"))
+print("USER =", os.getenv("MYSQL_USER"))
+print("PASSWORD =", os.getenv("MYSQL_PASSWORD"))
+print("DATABASE =", os.getenv("MYSQL_DATABASE"))
 
 # ---------------- Connection Settings ----------------
 DB_CONFIG = {
