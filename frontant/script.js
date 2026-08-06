@@ -1,5 +1,7 @@
 // ---------------- Config ----------------
-const API_BASE = "http://127.0.0.1:8000";
+// ---------------- Config ----------------
+const API_BASE = "https://multi-agent-ai-system-f7q2.onrender.com";// ---------------- Config ----------------
+
 
 // ---------------- Elements ----------------
 const form = document.getElementById("research-form");
