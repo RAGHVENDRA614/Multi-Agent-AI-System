@@ -2,7 +2,7 @@ import os
 
 from dotenv import load_dotenv
 from langchain.agents import create_agent
-from langchain_mistralai import ChatMistralAI
+from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
@@ -12,14 +12,14 @@ from backend.tools import web_search, scrape_url
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 load_dotenv(os.path.join(BASE_DIR, ".env"))
 
-print("MISTRAL_API_KEY =", repr(os.getenv("MISTRAL_API_KEY")))
+print("GROQ_API_KEY =", repr(os.getenv("GROQ_API_KEY")))
 
 # ---------------- Model Setup ----------------
-llm = ChatMistralAI(
-    model="mistral-small-latest",
+
+llm = ChatGroq(
+    model="openai/gpt-oss-120b",
     temperature=0,
 )
-
 # ---------------- Search Agent ----------------
 def build_search_agent():
     return create_agent(

@@ -1,3 +1,4 @@
+import time
 from backend.agents import build_reader_agent , build_search_agent , writer_chain , critic_chain
 
 def run_research_pipeline(topic : str) -> dict:
@@ -17,6 +18,8 @@ def run_research_pipeline(topic : str) -> dict:
 
     print("\n search result ",state['search_results'])
 
+    time.sleep(5)
+
     #step 2 - reader agent 
     print("\n"+" ="*50)
     print("step 2 - Reader agent is scraping top resources ...")
@@ -35,6 +38,8 @@ def run_research_pipeline(topic : str) -> dict:
 
     print("\nscraped content: \n", state['scraped_content'])
 
+    time.sleep(5)
+
     #step 3 - writer chain 
 
     print("\n"+" ="*50)
@@ -52,6 +57,8 @@ def run_research_pipeline(topic : str) -> dict:
     })
 
     print("\n Final Report\n",state['report'])
+
+    time.sleep(5)
 
     #critic report 
 
@@ -72,4 +79,3 @@ def run_research_pipeline(topic : str) -> dict:
 if __name__ == "__main__":
     topic = input("\n Enter a research topic : ")
     run_research_pipeline(topic)
-
