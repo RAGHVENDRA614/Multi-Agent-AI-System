@@ -31,6 +31,7 @@ def startup_event():
 class ResearchRequest(BaseModel):
     topic: str
     use_cache: bool = True
+    template: str = "academic"
 
 # ---------------- Routes ----------------
 @app.get("/")
@@ -40,6 +41,10 @@ def root():
 @app.post("/research")
 def research(request: ResearchRequest):
     topic = request.topic.strip()
+    template = request.template.strip().lower() if request.template else "academic"
+
+    if template not in ("academic", "business", "casual"):
+        template = "academic"
 
     if not topic:
         raise HTTPException(status_code=400, detail="Topic cannot be empty")
@@ -53,7 +58,7 @@ def research(request: ResearchRequest):
 
     # Run pipeline
     try:
-        result = run_research_pipeline(topic)
+        result = run_research_pipeline(topic, template)
 
     except Exception as e:
         print("\n" + "=" * 80)

@@ -17,9 +17,10 @@ print("GROQ_API_KEY =", repr(os.getenv("GROQ_API_KEY")))
 # ---------------- Model Setup ----------------
 
 llm = ChatGroq(
-    model="openai/gpt-oss-120b",
+    model="openai/gpt-oss-20b",
     temperature=0,
 )
+
 # ---------------- Search Agent ----------------
 def build_search_agent():
     return create_agent(
@@ -34,35 +35,61 @@ def build_reader_agent():
         tools=[scrape_url],
     )
 
-# ---------------- Writer Chain ----------------
-writer_prompt = ChatPromptTemplate.from_messages([
-    (
-        "system",
-        "You are an expert research writer. Write clear, structured and insightful reports.",
-    ),
-    (
-        "human",
-        """Write a detailed research report on the topic below.
+# ---------------- Report Templates ----------------
+TEMPLATE_INSTRUCTIONS = {
+    "academic": """Write in a formal, academic tone. Use precise terminology, cite all sources properly,
+and include a detailed methodology-style breakdown. Structure:
+- Abstract (2-3 sentences)
+- Introduction
+- Key Findings (minimum 3 well-explained points, with citations)
+- Discussion
+- Conclusion
+- Sources (list all URLs found in the research)""",
 
-Topic: {topic}
+    "business": """Write in a concise, executive tone suitable for business stakeholders. Focus on
+actionable insights and impact. Structure:
+- Executive Summary (3-4 sentences)
+- Key Insights (minimum 3 points, bullet-style, business-relevant)
+- Recommendations
+- Conclusion
+- Sources (list all URLs found in the research)""",
+
+    "casual": """Write in a simple, friendly, easy-to-understand tone. Avoid heavy jargon, explain
+technical terms simply. Structure:
+- Quick Intro (what is this about, in plain language)
+- Key Points (minimum 3, explained simply with examples)
+- Wrap-up
+- Sources (list all URLs found in the research)""",
+}
+
+def get_writer_prompt(template: str = "academic"):
+    instructions = TEMPLATE_INSTRUCTIONS.get(template, TEMPLATE_INSTRUCTIONS["academic"])
+
+    return ChatPromptTemplate.from_messages([
+        (
+            "system",
+            "You are an expert research writer. Write clear, structured and insightful reports.",
+        ),
+        (
+            "human",
+            f"""Write a detailed research report on the topic below.
+
+Topic: {{topic}}
 
 Research Gathered:
-{research}
+{{research}}
 
-Structure the report as:
-- Introduction
-- Key Findings (minimum 3 well-explained points)
-- Conclusion
-- Sources (list all URLs found in the research)
+{instructions}
 
 Be detailed, factual and professional.
 """,
-    ),
-])
+        ),
+    ])
 
-writer_chain = writer_prompt | llm | StrOutputParser()
+def get_writer_chain(template: str = "academic"):
+    return get_writer_prompt(template) | llm | StrOutputParser()
 
-# ---------------- Critic Chain ----------------
+# ---------------- Critic Chain (unchanged) ----------------
 critic_prompt = ChatPromptTemplate.from_messages([
     (
         "system",

@@ -1,7 +1,7 @@
 import time
-from backend.agents import build_reader_agent , build_search_agent , writer_chain , critic_chain
+from backend.agents import build_reader_agent, build_search_agent, get_writer_chain, critic_chain
 
-def run_research_pipeline(topic : str) -> dict:
+def run_research_pipeline(topic: str, template: str = "academic") -> dict:
 
     state = {}
 
@@ -43,13 +43,15 @@ def run_research_pipeline(topic : str) -> dict:
     #step 3 - writer chain 
 
     print("\n"+" ="*50)
-    print("step 3 - Writer is drafting the report ...")
+    print(f"step 3 - Writer is drafting the report ({template} style) ...")
     print("="*50)
 
     research_combined = (
         f"SEARCH RESULTS : \n {state['search_results']} \n\n"
         f"DETAILED SCRAPED CONTENT : \n {state['scraped_content']}"
     )
+
+    writer_chain = get_writer_chain(template)
 
     state["report"] = writer_chain.invoke({
         "topic" : topic,
@@ -72,10 +74,13 @@ def run_research_pipeline(topic : str) -> dict:
 
     print("\n critic report \n", state['feedback'])
 
+    state["template"] = template
+
     return state
 
 
 
 if __name__ == "__main__":
     topic = input("\n Enter a research topic : ")
-    run_research_pipeline(topic)
+    template = input("Enter template (academic/business/casual) [default: academic]: ").strip() or "academic"
+    run_research_pipeline(topic, template)

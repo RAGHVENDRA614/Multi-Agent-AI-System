@@ -1,11 +1,10 @@
 // ---------------- Config ----------------
-// ---------------- Config ----------------
-const API_BASE = "https://multi-agent-ai-system-f7q2.onrender.com";// ---------------- Config ----------------
-
+const API_BASE = "https://multi-agent-ai-system-f7q2.onrender.com";
 
 // ---------------- Elements ----------------
 const form = document.getElementById("research-form");
 const topicInput = document.getElementById("topic-input");
+const templateSelect = document.getElementById("template-select");
 const submitBtn = document.getElementById("submit-btn");
 const useCacheCheckbox = document.getElementById("use-cache");
 
@@ -95,6 +94,7 @@ form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const topic = topicInput.value.trim();
+  const template = templateSelect ? templateSelect.value : "academic";
   if (!topic) return;
 
   currentTopic = topic;
@@ -109,6 +109,7 @@ form.addEventListener("submit", async (e) => {
       body: JSON.stringify({
         topic: topic,
         use_cache: useCacheCheckbox.checked,
+        template: template,
       }),
     });
 
