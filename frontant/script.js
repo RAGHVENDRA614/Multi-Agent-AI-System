@@ -7,6 +7,7 @@ const topicInput = document.getElementById("topic-input");
 const templateSelect = document.getElementById("template-select");
 const submitBtn = document.getElementById("submit-btn");
 const useCacheCheckbox = document.getElementById("use-cache");
+const micBtn = document.getElementById("mic-btn");
 
 const resultPanel = document.getElementById("result-panel");
 const errorBanner = document.getElementById("error-banner");
@@ -27,6 +28,64 @@ document.querySelectorAll(".chip").forEach((chip) => {
     topicInput.focus();
   });
 });
+
+// ---------------- Voice Input (Web Speech API) ----------------
+const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null;
+let isListening = false;
+
+if (SpeechRecognitionAPI && micBtn) {
+  recognition = new SpeechRecognitionAPI();
+  recognition.lang = "en-US";
+  recognition.continuous = false;
+  recognition.interimResults = false;
+
+  micBtn.addEventListener("click", () => {
+    if (isListening) {
+      recognition.stop();
+      return;
+    }
+    try {
+      recognition.start();
+    } catch (err) {
+      // recognition might already be running; ignore
+    }
+  });
+
+  recognition.addEventListener("start", () => {
+    isListening = true;
+    micBtn.classList.add("listening");
+    micBtn.title = "Listening... click to stop";
+  });
+
+  recognition.addEventListener("end", () => {
+    isListening = false;
+    micBtn.classList.remove("listening");
+    micBtn.title = "Speak your topic";
+  });
+
+  recognition.addEventListener("result", (event) => {
+    const transcript = event.results[0][0].transcript;
+    topicInput.value = transcript;
+    topicInput.focus();
+  });
+
+  recognition.addEventListener("error", (event) => {
+    isListening = false;
+    micBtn.classList.remove("listening");
+    micBtn.title = "Speak your topic";
+
+    let message = "Voice input failed. Please try typing instead.";
+    if (event.error === "not-allowed" || event.error === "permission-denied") {
+      message = "Microphone access denied. Please allow mic permission and try again.";
+    } else if (event.error === "no-speech") {
+      message = "No speech detected. Please try again.";
+    }
+    showError(message);
+  });
+} else if (micBtn) {
+  micBtn.style.display = "none";
+}
 
 // ---------------- Step status animation ----------------
 const STEP_ORDER = ["search", "read", "write", "critic"];

@@ -133,13 +133,16 @@
     <div class="input-col">
       <form id="research-form" class="input-card">
         <label for="topic-input" class="input-label">Research Topic</label>
-        <input
-          type="text"
-          id="topic-input"
-          placeholder="e.g. Quantum computing breakthroughs in 2026"
-          autocomplete="off"
-          required
-        >
+        <div class="input-with-mic">
+          <input
+            type="text"
+            id="topic-input"
+            placeholder="e.g. Quantum computing breakthroughs in 2026"
+            autocomplete="off"
+            required
+          >
+          <button type="button" id="mic-btn" title="Speak your topic">🎤</button>
+        </div>
 
         <label for="template-select" class="input-label" style="margin-top: 16px;">Report Style</label>
         <select id="template-select">
